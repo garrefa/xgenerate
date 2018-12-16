@@ -16,6 +16,8 @@ import XCTest
 ///   - message: optional failure message
 ///   - file: file name to point at on assertion failure
 ///   - line: line number in file name to point at on assertion failure
+
+// swiftlint:disable:next identifier_name
 func AssertSequence<Seq: Sequence>(
     _ seq: Seq?,
     numberOfElements: Int,
@@ -43,6 +45,8 @@ func AssertSequence<Seq: Sequence>(
 ///   - message: optional failure message
 ///   - file: file name to point at on assertion failure
 ///   - line: line number in file name to point at on assertion failure
+
+// swiftlint:disable:next identifier_name
 func AssertType(
     of obj: AnyObject?,
     is expectedType: AnyClass,

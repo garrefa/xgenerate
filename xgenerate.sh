@@ -78,6 +78,14 @@ targets:
         Debug: xcconfigs/${PRODID}-Debug.xcconfig
         Release: xcconfigs/${PRODID}-Release.xcconfig
     dependencies: []
+    postbuildScripts:
+      - name: Swiftlint
+        script: |
+                if which swiftlint >/dev/null; then
+                  swiftlint
+                else
+                  echo "error: SwiftLint not installed"
+                fi
 EOM
 
 echo 'Include Unit Tests:'
