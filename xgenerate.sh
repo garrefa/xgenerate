@@ -178,6 +178,9 @@ find ./"${PRODID}"* -type f -name "*.swift" \
 find ./"${PRODID}"* -type f -name "*.swift" \
     -exec sed -i -e "s/2018 ORGNAME/${YEAR} ${ORGNAME}/g" {} \;
 
+find ./"${PRODID}"* -type f -name "*.swift" \
+    -exec sed -i -e "s/import Template/import ${PRODID}/g" {} \;
+
 cat >> generate.sh << EOF
 mint run yonaskolb/xcodegen
 EOF
