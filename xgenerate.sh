@@ -21,6 +21,14 @@ if [ $(echo $?) == 1 ]; then
     exit 1
 fi
 
+which rename >> /dev/null
+if [ $(echo $?) == 1 ]; then
+    echo "Please install rename and run this script again"
+    echo "http://plasmasturm.org/code/rename/"
+    echo "> brew install rename"
+    exit 1
+fi
+
 DATE=$(date +'%d/%m/%Y')
 YEAR=$(date +'%Y')
 rm ./PROJECT_YML &> /dev/null
@@ -198,6 +206,7 @@ chmod 744 ./generate.sh
 rm -- $0
 rm -rf .git
 rm README.md
+mv AXREADME.md README.md
 
 NEWLINE=$'\n'
 FINAL_MSG="Project ${PRODUCT_NAME} created.${NEWLINE}\
