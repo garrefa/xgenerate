@@ -96,7 +96,7 @@ targets:
                 fi
 EOM
 
-echo 'Include Unit Tests:'
+echo 'Include Unit Tests?'
 select UNIT_TESTS in Yes No; do
     if [ ! -z "$UNIT_TESTS" ]; then
     echo; break
@@ -119,7 +119,7 @@ cat ./PROJECT_YML_TMP >> ./PROJECT_YML
 rm ./PROJECT_YML_TMP &> /dev/null
 fi
 
-echo 'Include UI Tests:'
+echo 'Include UI Tests?'
 select UI_TESTS in Yes No; do
     if [ ! -z "$UI_TESTS" ]; then
     echo; break
@@ -211,6 +211,29 @@ mv AXREADME.md README.md
 NEWLINE=$'\n'
 FINAL_MSG="Project ${PRODUCT_NAME} created.${NEWLINE}\
 Use ./generate.sh to regenerate the .xcodeproj${NEWLINE}"
+
+echo 'Add .travis.yml?'
+select ADD_TRAVIS in Yes No; do
+    if [ ! -z "$ADD_TRAVIS" ]; then
+    echo; break
+    fi
+done
+
+if [ "$ADD_TRAVIS" == "Yes" ]; then
+cat >> .travis.yml << EOM
+os: osx
+osx_image: xcode10.1
+language: swift
+
+install:
+- gem install xcpretty
+- gem install xcpretty-travis-formatter
+
+script:
+- xcodebuild clean test -project ./Area51.xcodeproj -scheme Area51 -destination "platform=iOS Simulator,name=iPhone XR,OS=12.1" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO | xcpretty -f `xcpretty-travis-formatter` && exit ${PIPESTATUS[0]}
+
+EOM
+fi
 
 echo 'Initialize git repository?'
 select USE_GIT in Yes No; do
