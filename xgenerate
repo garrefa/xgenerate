@@ -13,26 +13,71 @@ cat << "EOF"
 
 EOF
 
-which mint >> /dev/null
-if [ $(echo $?) == 1 ]; then
-    echo "Please install mint and run this script again"
-    echo "https://github.com/yonaskolb/Mint"
-    echo "> brew install mint"
+SCRIPT_PATH=`greadlink -f ${BASH_SOURCE[0]}`
+SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+
+print_usage () {
+    echo "Usage: xgenerate PROJECT_DIRECTORY_NAME"
+    echo "> xgenerate area51"
+    echo
+}
+
+check_dependencies () {
+    brew list coreutils >> /dev/null
+    if [ $(echo $?) == 1 ]; then
+        echo "Please install coreutils and run this script again"
+        echo "https://www.gnu.org/software/coreutils"
+        echo "> brew install coreutils"
+        exit 1
+    fi
+
+    which mint >> /dev/null
+    if [ $(echo $?) == 1 ]; then
+        echo "Please install mint and run this script again"
+        echo "https://github.com/yonaskolb/Mint"
+        echo "> brew install mint"
+        exit 1
+    fi
+
+    which rename >> /dev/null
+    if [ $(echo $?) == 1 ]; then
+        echo "Please install rename and run this script again"
+        echo "http://plasmasturm.org/code/rename/"
+        echo "> brew install rename"
+        exit 1
+    fi
+}
+
+# Check usage... 
+PROJ_DIR=$1
+if [ -z $PROJ_DIR ]; then
+    echo "Error: Missing project directory name"
+    print_usage
     exit 1
 fi
 
-which rename >> /dev/null
-if [ $(echo $?) == 1 ]; then
-    echo "Please install rename and run this script again"
-    echo "http://plasmasturm.org/code/rename/"
-    echo "> brew install rename"
+if [ "$#" -ne 1 ]; then
+    echo "Error: Illegal number of parameters"
+    print_usage
     exit 1
 fi
 
+# Make sure dependencies are present
+check_dependencies
+
+# Check project directory does not already exists
+if [ -d "./$PROJ_DIR" ]; then
+    echo "Error: Directory $PROJ_DIR already exists"
+    exit 1
+fi
+
+# Copy files to project directory
+cp -R $SCRIPT_DIR ./$PROJ_DIR
+cd ./$PROJ_DIR
+
+# Get date and year for file headers
 DATE=$(date +'%d/%m/%Y')
 YEAR=$(date +'%Y')
-rm ./PROJECT_YML &> /dev/null
-rm ./PROJECT_YML_TMP &> /dev/null
 
 read -p 'Product Name: ' PRODUCT_NAME
 if [ -z "$PRODUCT_NAME" ]; then
@@ -117,6 +162,9 @@ cat >> PROJECT_YML_TMP << EOM
 EOM
 cat ./PROJECT_YML_TMP >> ./PROJECT_YML
 rm ./PROJECT_YML_TMP &> /dev/null
+mv ./TemplateTests ./"${PRODID}Tests"
+else
+rm -rf ./TemplateTests
 fi
 
 echo 'Include UI Tests?'
@@ -128,7 +176,7 @@ done
 
 if [ "$UI_TESTS" == "Yes" ]; then
 cat >> PROJECT_YML_TMP << EOM
-  ${PRODID}UITests:
+${PRODID}UITests:
     type: bundle.ui-testing
     platform: iOS
     sources: [${PRODID}UITests]
@@ -136,10 +184,13 @@ cat >> PROJECT_YML_TMP << EOM
         Debug: xcconfigs/${PRODID}UITests-Debug.xcconfig
         Release: xcconfigs/${PRODID}UITests-Release.xcconfig
     dependencies:
-      - target: ${PRODID}
+    - target: ${PRODID}
 EOM
 cat ./PROJECT_YML_TMP >> ./PROJECT_YML
 rm ./PROJECT_YML_TMP &> /dev/null
+mv ./TemplateUITests ./"${PRODID}UITests"
+else
+rm -rf ./TemplateUITests
 fi
 
 echo
@@ -161,8 +212,6 @@ set -e
 
 mv ./PROJECT_YML project.yml
 mv ./Template ./${PRODID}
-mv ./TemplateTests ./"${PRODID}Tests"
-mv ./TemplateUITests ./"${PRODID}UITests"
 
 rename "s/(Template)(.*)$/${PRODID}\$2/" ./xcconfigs/*
 
@@ -182,11 +231,15 @@ sed -i -e "s/Template.app\/Template/${PRODID}.app\/${PRODID}/g" ./xcconfigs/*
 find ./"${PRODID}" -type f -name "*.swift" \
     -exec sed -i -e "s/\/\/  Template/\/\/  ${PRODID}/g" {} \;
 
-find ./"${PRODID}Tests" -type f -name "*.swift" \
-    -exec sed -i -e "s/\/\/  TemplateTests/\/\/  ${PRODID}Tests/g" {} \;
+if [ "$UNIT_TESTS" == "Yes" ]; then
+    find ./"${PRODID}Tests" -type f -name "*.swift" \
+        -exec sed -i -e "s/\/\/  TemplateTests/\/\/  ${PRODID}Tests/g" {} \;
+fi
 
-find ./"${PRODID}UITests" -type f -name "*.swift" \
-    -exec sed -i -e "s/\/\/  TemplateUITests/\/\/  ${PRODID}UITests/g" {} \;
+if [ "$UI_TESTS" == "Yes" ]; then
+    find ./"${PRODID}UITests" -type f -name "*.swift" \
+        -exec sed -i -e "s/\/\/  TemplateUITests/\/\/  ${PRODID}UITests/g" {} \;
+fi
 
 find ./"${PRODID}"* -type f -name "*.swift" \
     -exec sed -i -e "s#AUTHOR on DATE#${AUTHOR} on ${DATE}#g" {} \;
@@ -203,7 +256,7 @@ EOF
 
 chmod 744 ./generate.sh
 
-rm -- $0
+rm $(basename "$SCRIPT_PATH")
 rm -rf .git
 rm README.md
 mv AXREADME.md README.md
@@ -230,7 +283,7 @@ install:
 - gem install xcpretty-travis-formatter
 
 script:
-- xcodebuild clean test -project ./Area51.xcodeproj -scheme Area51 -destination "platform=iOS Simulator,name=iPhone XR,OS=12.1" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO | xcpretty -f `xcpretty-travis-formatter` && exit ${PIPESTATUS[0]}
+- xcodebuild clean test -project ./${PRODID}.xcodeproj -scheme ${PRODID} -destination "platform=iOS Simulator,name=iPhone XR,OS=12.1" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO | xcpretty -f `xcpretty-travis-formatter` && exit ${PIPESTATUS[0]}
 
 EOM
 fi

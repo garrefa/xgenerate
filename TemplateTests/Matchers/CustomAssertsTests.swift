@@ -1,9 +1,9 @@
 //
 //  CustomAssertsTests.swift
-//  AXTemplateTests
+//  TemplateTests
 //
-//  Created by Alex Garrefa on 15/12/2018.
-//  Copyright © 2018 Garrefa. All rights reserved.
+//  Created by AUTHOR on DATE.
+//  Copyright © 2018 ORGNAME. All rights reserved.
 //
 
 import XCTest
