@@ -13,8 +13,9 @@ cat << "EOF"
 
 EOF
 
+LIB_VERSION="1.1"
 SCRIPT_PATH=`greadlink -f ${BASH_SOURCE[0]}`
-SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+TEMPLATES_DIR="$(brew --prefix)/Cellar/axtemplate/${LIB_VERSION}"
 
 print_usage () {
     echo "Usage: xgenerate PROJECT_DIRECTORY_NAME"
@@ -72,7 +73,7 @@ if [ -d "./$PROJ_DIR" ]; then
 fi
 
 # Copy files to project directory
-cp -R $SCRIPT_DIR ./$PROJ_DIR
+cp -R $TEMPLATES_DIR ./$PROJ_DIR
 cd ./$PROJ_DIR
 
 # Get date and year for file headers
@@ -256,9 +257,6 @@ EOF
 
 chmod 744 ./generate.sh
 
-rm $(basename "$SCRIPT_PATH")
-rm -rf .git
-rm README.md
 mv AXREADME.md README.md
 
 NEWLINE=$'\n'
