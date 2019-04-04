@@ -13,9 +13,9 @@ cat << "EOF"
 
 EOF
 
-LIB_VERSION="1.1"
+LIB_VERSION="1.2"
 SCRIPT_PATH=`greadlink -f ${BASH_SOURCE[0]}`
-TEMPLATES_DIR="$(brew --prefix)/Cellar/axtemplate/${LIB_VERSION}"
+TEMPLATES_DIR="$(brew --prefix)/Cellar/xgenerate/${LIB_VERSION}"
 
 print_usage () {
     echo "Usage: xgenerate PROJECT_DIRECTORY_NAME"
