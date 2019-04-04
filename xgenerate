@@ -13,11 +13,12 @@ cat << "EOF"
 
 EOF
 
-LIB_VERSION="1.2"
+LIB_VERSION="1.3"
 SCRIPT_PATH=`greadlink -f ${BASH_SOURCE[0]}`
 TEMPLATES_DIR="$(brew --prefix)/Cellar/xgenerate/${LIB_VERSION}"
 
 print_usage () {
+    echo "Error: missing PROJECT_DIRECTORY_NAME"
     echo "Usage: xgenerate PROJECT_DIRECTORY_NAME"
     echo "> xgenerate area51"
     echo
@@ -80,7 +81,7 @@ cd ./$PROJ_DIR
 DATE=$(date +'%d/%m/%Y')
 YEAR=$(date +'%Y')
 
-read -p 'Product Name: ' PRODUCT_NAME
+read -p 'Product Name: ' -i "${PROJ_DIR}" PRODUCT_NAME
 if [ -z "$PRODUCT_NAME" ]; then
     echo 'Product name cannot be empty'
     exit 1
@@ -252,7 +253,7 @@ find ./"${PRODID}"* -type f -name "*.swift" \
     -exec sed -i -e "s/import Template/import ${PRODID}/g" {} \;
 
 cat >> generate.sh << EOF
-mint run yonaskolb/xcodegen
+mint run yonaskolb/xcodegen@2.3.0
 EOF
 
 chmod 744 ./generate.sh
