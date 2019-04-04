@@ -258,7 +258,10 @@ EOF
 
 chmod 744 ./generate.sh
 
-mv AXREADME.md README.md
+cat >> README.md << EOM
+Created with [xgenerate v${LIB_VERSION}](https://github.com/garrefa/xgenerate).
+---
+EOM
 
 NEWLINE=$'\n'
 FINAL_MSG="Project ${PRODUCT_NAME} created.${NEWLINE}\
