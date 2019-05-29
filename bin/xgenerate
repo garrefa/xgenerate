@@ -81,7 +81,7 @@ cd ./$PROJ_DIR
 DATE=$(date +'%d/%m/%Y')
 YEAR=$(date +'%Y')
 
-read -p 'Product Name: ' -i "${PROJ_DIR}" PRODUCT_NAME
+read -e -p 'Product Name: ' -i "${PROJ_DIR}" PRODUCT_NAME
 if [ -z "$PRODUCT_NAME" ]; then
     echo 'Product name cannot be empty'
     exit 1
