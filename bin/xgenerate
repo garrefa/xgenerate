@@ -15,10 +15,10 @@ EOF
 
 LIB_VERSION="1.3"
 SCRIPT_PATH=`greadlink -f ${BASH_SOURCE[0]}`
-TEMPLATES_DIR="$(brew --prefix)/Cellar/xgenerate/${LIB_VERSION}"
+# TEMPLATES_DIR="$(brew --prefix)/Cellar/xgenerate/${LIB_VERSION}"
+TEMPLATES_DIR="/usr/local/share/xgenerate"
 
 print_usage () {
-    echo "Error: missing PROJECT_DIRECTORY_NAME"
     echo "Usage: xgenerate PROJECT_DIRECTORY_NAME"
     echo "> xgenerate area51"
     echo
@@ -50,7 +50,7 @@ check_dependencies () {
     fi
 }
 
-# Check usage... 
+# Check usage...
 PROJ_DIR=$1
 if [ -z $PROJ_DIR ]; then
     echo "Error: Missing project directory name"
